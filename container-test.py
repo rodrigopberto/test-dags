@@ -76,7 +76,7 @@ with DAG('pipeline_python_2', default_args=default_args) as dag:
         task_id=t2_1_id,
         provide_context=True,
         op_kwargs={
-            'image_name': 'task1',
+            'image_name': 'dag1-container-test',
             'my_id': t2_1_id
         },
         python_callable=launch_docker_container
@@ -87,7 +87,7 @@ with DAG('pipeline_python_2', default_args=default_args) as dag:
         task_id=t2_2_id,
         provide_context=True,
         op_kwargs={
-            'image_name': 'task2',
+            'image_name': 'dag1-container-test',
             'my_id': t2_2_id
         },
         python_callable=launch_docker_container
