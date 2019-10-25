@@ -21,6 +21,7 @@ def launch_docker_container(**context):
     
     image_name = context['image_name']
    
+    cli.images.pull(image_name)
 
     log.info(f"Creating image {image_name}")
     # get environment variables from UI
