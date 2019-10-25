@@ -6,6 +6,16 @@ from datetime import datetime
 
 from airflow.operators.python_operator import PythonOperator
 
+import logging
+import docker
+
+
+def do_test_docker():
+    client = docker.from_env()
+    for image in client.images().list():
+        logging.info(str(image))
+
+
 default_args = {
     'owner': 'airflow',
     'start_date': datetime(2019, 2, 15),
@@ -58,5 +68,10 @@ with DAG('pipeline_python_2', default_args=default_args) as dag:
             'data_to_read': [t2_1_id, t2_2_id]
         }
     )
+    
+    t1_5 = PythonOperator(
+        task_id="test_docker",
+        python_callable=do_test_docker
+    )
 
-    t1 >> [t2_1, t2_2] >> t3
+    t1 >> t1_5 >> [t2_1, t2_2] >> t3
