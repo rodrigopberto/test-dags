@@ -35,7 +35,7 @@ def launch_docker_container(**context):
     container_id = container.id
     log.info(f"Running container with id {container_id}")
 
-    logs = client.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
+    logs = cli.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
 
     try:
         while True:
@@ -44,7 +44,7 @@ def launch_docker_container(**context):
     except StopIteration:
         log.info("Docker has finished!")
     
-    inspect = self.cli.api.inspect_container(container_id)
+    inspect = cli.api.inspect_container(container_id)
     log.info(inspect)
     log.info(inspect)
     if inspect['State']['ExitCode'] != 0:
