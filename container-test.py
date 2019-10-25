@@ -1,51 +1,62 @@
-"""
-Code that goes along with the Airflow located at:
-http://airflow.readthedocs.org/en/latest/tutorial.html
-"""
+import logging
+
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from datetime import datetime, timedelta
+from datetime import datetime
 
+from airflow.operators.python_operator import PythonOperator
 
 default_args = {
-    "owner": "airflow",
-    "depends_on_past": False,
-    "start_date": datetime(2015, 6, 1),
-    "email": ["airflow@airflow.com"],
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
-    # 'queue': 'bash_queue',
-    # 'pool': 'backfill',
-    # 'priority_weight': 10,
-    # 'end_date': datetime(2016, 1, 1),
+    'owner': 'airflow',
+    'start_date': datetime(2019, 2, 15),
 }
 
-dag = DAG("containter-test", default_args=default_args, schedule_interval=timedelta(30))
+def read_xcoms(**context):
+    for idx, task_id in enumerate(context['data_to_read']):
+        data = context['task_instance'].xcom_pull(task_ids=task_id, key='data')
+        logging.info(f'[{idx}] I have received data: {data} from task {task_id}')
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
-t1 = BashOperator(task_id="print_date", bash_command="date", dag=dag)
+def launch_docker_container(**context):
+    # just a mock for now
+    logging.info(context['ti'])
+    logging.info(context['image_name'])
+    my_id = context['my_id']
+    context['task_instance'].xcom_push('data', f'my name is {my_id}', context['execution_date'])
 
-t2 = BashOperator(task_id="sleep", bash_command="sleep 5", retries=3, dag=dag)
+with DAG('pipeline_python_2', default_args=default_args) as dag:
+    t1 = BashOperator(
+        task_id='print_date1',
+        bash_command='date')
 
-templated_command = """
-    {% for i in range(5) %}
-        echo "{{ ds }}"
-        echo "{{ macros.ds_add(ds, 7)}}"
-        echo "{{ params.my_param }}"
-    {% endfor %}
-"""
+    t2_1_id = 'do_task_one'
+    t2_1 = PythonOperator(
+        task_id=t2_1_id,
+        provide_context=True,
+        op_kwargs={
+            'image_name': 'task1',
+            'my_id': t2_1_id
+        },
+        python_callable=launch_docker_container
+    )
 
-t3 = BashOperator(
-    task_id="templated",
-    bash_command=templated_command,
-    params={"my_param": "Parameter I passed in"},
-    dag=dag,
-)
+    t2_2_id = 'do_task_two'
+    t2_2 = PythonOperator(
+        task_id=t2_2_id,
+        provide_context=True,
+        op_kwargs={
+            'image_name': 'task2',
+            'my_id': t2_2_id
+        },
+        python_callable=launch_docker_container
+    )
 
-t4 = BashOperator(task_id="container", bash_command = "docker run rodrigocver/dag1-container-test:latest" ,retries = 3, dag=dag)
+    t3 = PythonOperator(
+        task_id='read_xcoms',
+        provide_context=True,
+        python_callable=read_xcoms,
+        op_kwargs={
+            'data_to_read': [t2_1_id, t2_2_id]
+        }
+    )
 
-t2.set_upstream(t1)
-t3.set_upstream(t1)
-t4.set_upstream(t2)
+    t1 >> [t2_1, t2_2] >> t3
