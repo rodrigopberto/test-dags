@@ -17,15 +17,23 @@ def do_test_docker():
         log.info(image)
         
 def launch_docker_container(**context):
+    cli = docker.from_env()
+    
     image_name = context['image_name']
-    client: Client = docker.from_env()
+   
 
     log.info(f"Creating image {image_name}")
-    container = client.create_container(image=image_name)
+    # get environment variables from UI
+    try:
+        environment = Variable.get(image_name, deserialize_json=True)
+    except:
+        environment = dict()
 
-    container_id = container.get('Id')
+    environment['EXECUTION_ID'] = (context['dag_run'].run_id)
+    
+    container: Container = cli.containers.run(detach=True, image=image_name, environment=environment)
+    container_id = container.id
     log.info(f"Running container with id {container_id}")
-    client.start(container=container_id)
 
     logs = client.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
 
@@ -34,16 +42,16 @@ def launch_docker_container(**context):
             l = next(logs)
             log.info(f"Task log: {l}")
     except StopIteration:
-        pass
-        
-    inspect = client.inspect_container(container)
+        log.info("Docker has finished!")
+    
+    inspect = self.cli.api.inspect_container(container_id)
+    log.info(inspect)
     log.info(inspect)
     if inspect['State']['ExitCode'] != 0:
                 raise Exception("Container has not finished with exit code 0")
 
-    log.info(f"Task ends!")
-    my_id = context['my_id']
-    context['task_instance'].xcom_push('data', f'my name is {my_id}', context['execution_date'])
+    log.info(f"Result was {result}")
+    context['task_instance'].xcom_push('result', result, context['execution_date'])
 
 
 
