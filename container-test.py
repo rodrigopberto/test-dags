@@ -9,9 +9,10 @@ from airflow.operators.python_operator import PythonOperator
 import logging
 import docker
 
+log = logging.getLogger(__name__)
+
 
 def do_test_docker():
-    log = logging.getLogger('_test_docker')
     for image in docker.from_env().images.list():
         log.info(image)
         
