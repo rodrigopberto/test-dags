@@ -18,7 +18,7 @@ def do_test_docker():
 
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2019, 2, 15),
+    'start_date': datetime(2019, 10, 23),
 }
 
 def read_xcoms(**context):
