@@ -14,6 +14,36 @@ def do_test_docker():
     log = logging.getLogger('_test_docker')
     for image in docker.from_env().images.list():
         log.info(image)
+        
+def launch_docker_container(**context):
+    image_name = context['image_name']
+    client: Client = docker.from_env()
+
+    log.info(f"Creating image {image_name}")
+    container = client.create_container(image=image_name)
+
+    container_id = container.get('Id')
+    log.info(f"Running container with id {container_id}")
+    client.start(container=container_id)
+
+    logs = client.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
+
+    try:
+        while True:
+            l = next(logs)
+            log.info(f"Task log: {l}")
+    except StopIteration:
+        pass
+        
+    inspect = client.inspect_container(container)
+    log.info(inspect)
+    if inspect['State']['ExitCode'] != 0:
+                raise Exception("Container has not finished with exit code 0")
+
+    log.info(f"Task ends!")
+    my_id = context['my_id']
+    context['task_instance'].xcom_push('data', f'my name is {my_id}', context['execution_date'])
+
 
 
 default_args = {
@@ -26,12 +56,6 @@ def read_xcoms(**context):
         data = context['task_instance'].xcom_pull(task_ids=task_id, key='data')
         logging.info(f'[{idx}] I have received data: {data} from task {task_id}')
 
-def launch_docker_container(**context):
-    # just a mock for now
-    logging.info(context['ti'])
-    logging.info(context['image_name'])
-    my_id = context['my_id']
-    context['task_instance'].xcom_push('data', f'my name is {my_id}', context['execution_date'])
 
 with DAG('pipeline_python_2', default_args=default_args) as dag:
     t1 = BashOperator(
