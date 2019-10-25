@@ -49,7 +49,7 @@ def launch_docker_container(**context):
     log.info(inspect)
     if inspect['State']['ExitCode'] != 0:
                 raise Exception("Container has not finished with exit code 0")
-    result = json.loads("mock result")
+    result = json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]')
     
     log.info(f"Result was {result}")
     context['task_instance'].xcom_push('result', result, context['execution_date'])
