@@ -35,7 +35,7 @@ def launch_docker_container(**context):
     container_id = container.id
     log.info(f"Running container with id {container_id}")
 
-    logs = cli.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
+    #logs = cli.logs(container_id, follow=True, stderr=True, stdout=True, stream=True, tail='all')
 
     try:
         while True:
