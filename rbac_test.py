@@ -16,6 +16,7 @@ default_args = {
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    "access_control": {'viewer-tutorial1': {'can_dag_read', 'can_dag_edit'}}
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -24,10 +25,7 @@ default_args = {
 
 dag = DAG("rbac_test",
     default_args=default_args,
-    schedule_interval=timedelta(1),
-    access_control = {
-        'viewer-tutorial1':{'can_dag_read','can_dag_edit'},
-    },
+    schedule_interval=timedelta(1)
     
 )
 
