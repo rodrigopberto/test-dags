@@ -26,7 +26,7 @@ dag = DAG("rbac_test",
     default_args=default_args,
     schedule_interval=timedelta(1),
     access_control = {
-        "viewer-tutorial1":{"can_dag_read","can_dag_edit"}
+        "viewer-tutorial1":{"can_dag_read","can_dag_edit"},
     }
 )
 
