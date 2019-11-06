@@ -28,7 +28,7 @@ dag = DAG("rbac_test",
     access_control = {
         'viewer-tutorial1':{'can_dag_read','can_dag_edit'},
     },
-    **DEFAULT_DAG_ARGS,
+    
 )
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
