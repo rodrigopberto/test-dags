@@ -94,10 +94,5 @@ with DAG('energy_update_test', default_args=default_args) as dag:
             'data_to_read': [t2_1_id]
         }
     )
-    
-    t1_5 = PythonOperator(
-        task_id="test_docker",
-        python_callable=do_test_docker
-    )
 
     t1 >> t2_1 >> t3
