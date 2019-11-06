@@ -59,8 +59,7 @@ def launch_docker_container(**context):
 
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2019, 11, 5),
-    'catchup'=False
+    'start_date': datetime(2019, 11, 3)
 }
 
 def read_xcoms(**context):
@@ -69,7 +68,7 @@ def read_xcoms(**context):
         logging.info(f'[{idx}] I have received data: {data} from task {task_id}')
 
 
-with DAG('energy_update_test', default_args=default_args) as dag:
+with DAG('energy_update_test', default_args=default_args, catchup=False) as dag:
     t1 = BashOperator(
         task_id='print_date1',
         bash_command='date')
