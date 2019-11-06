@@ -59,8 +59,7 @@ def launch_docker_container(**context):
 
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2019, 11, 5),
-    'schedule_interval' = '* 6 * * *'
+    'start_date': datetime(2019, 11, 5)
 }
 
 def read_xcoms(**context):
