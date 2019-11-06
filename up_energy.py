@@ -91,7 +91,7 @@ with DAG('energy_update_test', default_args=default_args) as dag:
         provide_context=True,
         python_callable=read_xcoms,
         op_kwargs={
-            'data_to_read': [t2_1_id, t2_2_id]
+            'data_to_read': [t2_1_id]
         }
     )
     
