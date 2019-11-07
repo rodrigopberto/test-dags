@@ -68,7 +68,7 @@ def read_xcoms(**context):
         logging.info(f'[{idx}] I have received data: {data} from task {task_id}')
 
 
-with DAG('energy_update_test', default_args=default_args, catchup=False) as dag:
+with DAG('energy_update_test', default_args=default_args, catchup=False,schedule_interval=timedelta(hours=8)) as dag:
     t1 = BashOperator(
         task_id='print_date1',
         bash_command='date')
