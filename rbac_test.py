@@ -10,13 +10,13 @@ from datetime import datetime, timedelta
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2019, 11, 3),
+    "start_date": datetime(2019, 11, 6),
     "email": ["airflow@airflow.com"],
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5),
-    "access_control": {"role1": {"can_dag_read", "can_dag_edit"}}
+    "retry_delay": timedelta(minutes=5)
+    #"access_control": {"role1": {"can_dag_read", "can_dag_edit"}}
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -25,7 +25,9 @@ default_args = {
 
 dag = DAG("rbac_test",
     default_args=default_args,
-    schedule_interval=timedelta(1)
+    schedule_interval=timedelta(minutes=1),
+    catchup = FALSE,
+    access_control = {"role1": {"can_dag_read", "can_dag_edit"}}
     
 )
 
