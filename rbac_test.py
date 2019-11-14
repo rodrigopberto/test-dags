@@ -27,7 +27,7 @@ dag = DAG("rbac_test",
     default_args=default_args,
     schedule_interval=timedelta(minutes=1),
     catchup = False,
-    access_control = {"role1": {"can_dag_read", "can_dag_edit"}}
+    access_control = {'role1': ['can_dag_read']}
     
 )
 
