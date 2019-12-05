@@ -59,8 +59,7 @@ def launch_docker_container(**context):
 
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2019, 12, 4),
-    'schedule_interval' = '* 0 * * *'
+    'start_date': datetime(2019, 12, 4)
 }
 
 def read_xcoms(**context):
@@ -69,7 +68,7 @@ def read_xcoms(**context):
         logging.info(f'[{idx}] I have received data: {data} from task {task_id}')
 
 
-with DAG('windog_test',catchup=False, default_args=default_args) as dag:
+with DAG('windog_test' default_args=default_args,catchup=False,,schedule_interval=timedelta(hours=19),max_active_runs=1) as dag:
     t1 = BashOperator(
         task_id='print_date1',
         bash_command='date')
