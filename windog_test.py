@@ -87,18 +87,4 @@ with DAG('windog_test', default_args=default_args,catchup=False,schedule_interva
 
     
 
-    t3 = PythonOperator(
-        task_id='read_xcoms',
-        provide_context=True,
-        python_callable=read_xcoms,
-        op_kwargs={
-            'data_to_read': [t2_1_id, t2_2_id]
-        }
-    )
-    
-    t1_5 = PythonOperator(
-        task_id="test_docker",
-        python_callable=do_test_docker
-    )
-
     t1 >> t2_1
